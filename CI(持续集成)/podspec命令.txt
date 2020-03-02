@@ -1,0 +1,66 @@
+验证.podspec文件   
+
+lip -info (库名) 查看库架构
+
+pod package KFData.podspec
+
+ 
+// --verbose 如果验证失败会报错误信息
+pod spec lint ZYRunTimeCoT.podspec --verbose
+
+pod repo push ZYRunTimeCoT ZYRunTimeCoT.podspec
+
+The spec did not pass validation, due to 6 warnings (but you can use `--allow-warnings` to ignore them).
+
+ 依赖了其他库,添加--use-libraries选项
+
+pod trunk push YourPodProjectName.podspec 
+
+
+1.key1
+   这里需要补充说明一点，
+
+　　私有库有引用私有库的情况，在验证已经推送podspec的时候都需要加上所有的资源地址，不然，pod会默认从cocoapods官方查询的。
+
+　　如，私有库a要引用私有库b，在验证与推送私有库a的时候，要加上私有库b的远程仓库地址，如下
+
+　　注意：要在pod lib lint 或者 pod spec lint 以及 pod repo push ....时候加上被引用的私有库地址　　
+pod spec lint --sources='#私有库b的远程仓库地址(如：http://xxxxxx.git)#,https://github.com/CocoaPods/Specs'
+　pod repo push #本地Repo名字# #.podspec名# --sources='[私有库b的远程仓库地址(如：http://xxxxxx.git)],https://github.com/CocoaPods/Specs'
+
+#demo：
+　pod spec lint --sources='http://xxxxxx/iOSRepos.git,https://github.com/CocoaPods/Specs'
+
+　pod repo push iOSTest iOSTest.podspec --sources='http://git.yinqiyun.com/xfx/iOSRepos.git,https://github.com/CocoaPods/Specs'
+
+2.key2
+  报错 ··· error: include of non-modular header inside framework module ··· [-Werror,-Wnon-modular-include-in-framework-module]
+
+　　解决办法：在pod lib lint 或者 pod spec lint 以及 pod repo push ....时候加上   --use-libraries
+
+  pod lib lint --use-libraries
+    #或者
+    pod spec lint --use-libraries
+
+    #当然，在提交的时候也要加上
+    pod repo push <repoName> <podspec> --use-libraries
+
+
+
+2、Unable to accept duplicate entry for: TTLockSDK (2.6.4)
+
+这个是因为之前已经push过2.6.4版本了，下面给出解决方法：
+
+方案一：
+
+重新添加标签，比如：2.6.5，然后再push，具体的操作可见上一篇博客中创建podspec开始的部分
+
+方案二：
+
+移除本版本，然后重新push，在终端执行下面指令：
+
+pod trunk delete TTLockSDK 2.6.4 （即：pod trunk delete 库名 版本号）
+
+这条指令可以帮助移除某个版本，完成之后，可以pod setup一下，然后pod search，可以发现，该版本以及不存在了，这个时候就可以重新push版本
+
+
